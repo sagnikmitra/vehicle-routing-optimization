@@ -7,7 +7,7 @@ from random import randint
 import time
 from collections import namedtuple
 from matplotlib import cm
-import re
+
 # Streamlit for Visualization
 import streamlit as st
 import numpy as np
@@ -195,13 +195,11 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
     # Plots the warehouse.
     ax.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
                s=120, c='r', marker='s', label='warehouse')
-    ax.set_title('Assigned Customer Map of Vehicle ' +
-                 str(label_name)[7:len(str(label_name))])
-    # ax.set_title('Assigned Customer Map of Vehicle ' + str(label_name).title())
+    ax.set_title('Assigned Customer Map of Vehicle ' + str(vehicle.index + 1))
     ax.legend()
     ax.grid()
     st.write(fig)
-    st.write(str(label_name)[7:len(str(label_name))])
+
     return
 
 
@@ -610,6 +608,7 @@ def solve_vrp(warehouses, customers, is_plot):
     vehicles = assign_customers_to_vehicles(customers, vehicles, max_capacity)
 
     if is_plot is True:
+        plot_assigned_customers(warehouses, vehicles, [])
         for i in range(0, NUM_VEHICLES):
             if len(vehicles[i].customers) > 0:
                 plot_assigned_customers(warehouses, vehicles, [i])
