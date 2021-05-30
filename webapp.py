@@ -107,8 +107,8 @@ def plot_input_data(warehouses, customers):
 
         plt.legend()
         plt.grid()
-        plt.savefig('../images/plotinputdata.png')
-        st.image('../images/plotinputdata.png')
+        plt.savefig('./images/plotinputdata.png')
+        st.image('./images/plotinputdata.png')
         if(st.button("Hide")):
             plt.close()
 
@@ -141,8 +141,8 @@ def plot_clusters(warehouses, customers, centroids, clusters, cluster_indexes_to
     plt.legend()
     plt.figure(figsize=(8, 4))
     plt.grid()
-    plt.savefig('../images/cluster.png')
-    st.image('../images/cluster.png')
+    plt.savefig('./images/cluster.png')
+    st.image('./images/cluster.png')
     return
 
 
