@@ -607,6 +607,6 @@ def solve_vrp(warehouses, customers, is_plot):
 path = os.path.dirname('host')
 my_file = path+'locations.csv'
 is_plot = True
-warehouses, customers = read_csv_input_data('./locations.csv')
+warehouses, customers = pd.read_csv('./locations.csv')
 output = solve_vrp(warehouses, customers, is_plot)
 st.write(output)
