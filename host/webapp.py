@@ -40,7 +40,7 @@ def read_csv_input_data(input_file_csv):
     :return:
     """
     # Load the data
-    locations_df = pd.read_csv('../data/locations.csv', delimiter=',', header=None, names=[
+    locations_df = pd.read_csv('locations.csv', delimiter=',', header=None, names=[
                                'latitude', 'longitude', 'is_customer'])
     # st.write(locations_df)
 
