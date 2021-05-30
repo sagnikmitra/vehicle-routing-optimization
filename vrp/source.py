@@ -7,7 +7,6 @@ import math
 import itertools
 import time
 from collections import namedtuple
-import streamlit as st
 import numpy as np
 import numpy.linalg as LA
 import pandas as pd
@@ -31,7 +30,7 @@ def read_csv_input_data(input_file_csv):
     :return:
     """
     # Load the data
-    locations_df = pd.read_csv('../data/locations.csv', delimiter=',', header=None, names=[
+    locations_df = pd.read_csv(input_file_csv, delimiter=',', header=None, names=[
                                'latitude', 'longitude', 'is_customer'])
     # print(locations_df)
 
@@ -122,7 +121,6 @@ def plot_clusters(warehouses, customers, centroids, clusters, cluster_indexes_to
             # Plots the customers by each cluster.
             plt.scatter(coords_customers[clusters == i, 0], coords_customers[clusters == i, 1], s=60, c=color,
                         label=label_name)
-
             # Plots the centroid of each cluster.
             plt.scatter(centroids[i, 0], centroids[i, 1],
                         s=240, c='b', marker='x', linewidths=1)
@@ -492,7 +490,7 @@ def two_opt(points):
     point_count = len(points)
     best_distance, _, best_tour = greedy(points)
     improved = True
-    t = time.process_time()
+    t = time.clock()
     while improved:
         improved = False
         for start, end in itertools.combinations(range(point_count), 2):
@@ -503,7 +501,7 @@ def two_opt(points):
                 best_distance = curr_distance
                 improved = True
                 break
-        if time.time() - t >= 4 * 3600 + 59 * 60:
+        if time.clock() - t >= 4 * 3600 + 59 * 60:
             improved = False
     return tour_distance(best_tour, points), 0, best_tour
 
@@ -597,7 +595,7 @@ def solve_vrp(warehouses, customers, is_plot):
     # between the warehouse and centroid.
     # i.e. The sorted cluster centroids are the vehicles to assign the customers.
     # We assume that each vehicle's max capacity is 22 (i.e. capacity = number of customers / number of vehicles)
-    max_capacity = len(customers) // NUM_VEHICLES
+    max_capacity = len(customers) / NUM_VEHICLES
     print('max capacity = %d' % max_capacity)
     vehicles = init_vehicles(warehouses, centroids,
                              clusters, inliers, max_capacity)
@@ -632,6 +630,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         input_file = sys.argv[1].strip()
         is_plot = str2bool(sys.argv[2].strip())
+
         warehouses, customers = read_csv_input_data(input_file)
         output = solve_vrp(warehouses, customers, is_plot)
         print(output)
