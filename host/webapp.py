@@ -3,6 +3,7 @@ The VRP(or mTSP) is NP-hard problem, therefore this algorithm uses heuristic app
 author: louie
 """
 
+import os
 import sys
 import math
 import itertools
@@ -603,7 +604,9 @@ def solve_vrp(warehouses, customers, is_plot):
     return output_data
 
 
+path = os.path.dirname('host')
+my_file = path+'locations.csv'
 is_plot = True
-warehouses, customers = read_csv_input_data('locations.csv')
+warehouses, customers = read_csv_input_data(my_file)
 output = solve_vrp(warehouses, customers, is_plot)
 st.write(output)
