@@ -41,7 +41,7 @@ def read_csv_input_data(input_file_csv):
     :return:
     """
     # Load the data
-    locations_df = pd.read_csv('locations.csv', delimiter=',', header=None, names=[
+    locations_df = pd.read_csv('./locations.csv', delimiter=',', header=None, names=[
                                'latitude', 'longitude', 'is_customer'])
     # st.write(locations_df)
 
@@ -607,6 +607,6 @@ def solve_vrp(warehouses, customers, is_plot):
 path = os.path.dirname('host')
 my_file = path+'locations.csv'
 is_plot = True
-warehouses, customers = read_csv_input_data(my_file)
+warehouses, customers = read_csv_input_data('./locations.csv')
 output = solve_vrp(warehouses, customers, is_plot)
 st.write(output)
