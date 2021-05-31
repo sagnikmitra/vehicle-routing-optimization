@@ -7,7 +7,7 @@ from random import randint
 import time
 from collections import namedtuple
 from matplotlib import cm
-
+import re
 # Streamlit for Visualization
 import streamlit as st
 import numpy as np
@@ -22,7 +22,7 @@ st.set_page_config(
 st.title("Vehicle Route Problem")
 NUM_VEHICLES = 2
 st.write("### Enter the Number of the Vehicles from the below Slider: ")
-locations_df = pd.read_csv('./locations.csv', delimiter=',', header=None, names=[
+locations_df = pd.read_csv('./newlocations.csv', delimiter=',', header=None, names=[
     'latitude', 'longitude', 'is_customer'])
 # st.write(locations_df)
 
@@ -47,7 +47,7 @@ def read_csv_input_data(input_file_csv):
     :return:
     """
     # Load the data
-    locations_df = pd.read_csv('./locations.csv', delimiter=',', header=None, names=[
+    locations_df = pd.read_csv('./newlocations.csv', delimiter=',', header=None, names=[
                                'latitude', 'longitude', 'is_customer'])
     # st.write(locations_df)
 
@@ -195,11 +195,13 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
     # Plots the warehouse.
     ax.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
                s=120, c='r', marker='s', label='warehouse')
-    ax.set_title('Assigned Customer Map of Vehicle ' + str(vehicle.index + 1))
+    ax.set_title('Assigned Customer Map of Vehicle ' +
+                 str(label_name)[7:len(str(label_name))])
+    # ax.set_title('Assigned Customer Map of Vehicle ' + str(label_name).title())
     ax.legend()
     ax.grid()
     st.write(fig)
-
+    st.write(str(label_name)[7:len(str(label_name))])
     return
 
 
@@ -608,7 +610,6 @@ def solve_vrp(warehouses, customers, is_plot):
     vehicles = assign_customers_to_vehicles(customers, vehicles, max_capacity)
 
     if is_plot is True:
-        plot_assigned_customers(warehouses, vehicles, [])
         for i in range(0, NUM_VEHICLES):
             if len(vehicles[i].customers) > 0:
                 plot_assigned_customers(warehouses, vehicles, [i])
@@ -629,8 +630,8 @@ def solve_vrp(warehouses, customers, is_plot):
 
 
 path = os.path.dirname('host')
-my_file = path+'locations.csv'
+my_file = path+'newlocations.csv'
 is_plot = True
-warehouses, customers = read_csv_input_data('./locations.csv')
+warehouses, customers = read_csv_input_data('./newlocations.csv')
 output = solve_vrp(warehouses, customers, is_plot)
 st.write(output)

@@ -19,9 +19,13 @@ from sklearn.cluster import KMeans
 
 st.set_page_config(
     layout="wide", page_title="Vehicle Routing Problem", page_icon=None)
-st.title("Vehicle Route Problem")
+st.title("Vehicle Routing Problem")
+st.text("Done by: Sagnik Mitra")
+st.text("Approach inspired by: author: louie")
+st.success("This is a demo simulation for testing purpose consisting of a dataset  having 536 rows among which the first rows where the is_customer function returns 0, is taken as warehouse. I have a 5000 rows csv that will be used for the main program.")
 NUM_VEHICLES = 2
 st.write("### Enter the Number of the Vehicles from the below Slider: ")
+st.info("The Slider has a default value of 10. And, it has max_value as the length of the locations.csv mentioned above and min_value as 1.")
 locations_df = pd.read_csv('./locations.csv', delimiter=',', header=None, names=[
     'latitude', 'longitude', 'is_customer'])
 # st.write(locations_df)
@@ -136,7 +140,8 @@ def plot_clusters(warehouses, customers, centroids, clusters, cluster_indexes_to
 
     cluster_labels = np.unique(clusters)
     n_clusters = cluster_labels.shape[0]
-
+    fig = plt.figure(figsize=(20, 12), dpi=80)
+    ax = fig.add_subplot(1, 1, 1)
     cmap = plt.cm.get_cmap('Dark2')
     for i in range(len(cluster_labels)):
         if (i in cluster_indexes_to_show) or (cluster_indexes_to_show == []):
@@ -144,20 +149,28 @@ def plot_clusters(warehouses, customers, centroids, clusters, cluster_indexes_to
                 1.0 * cluster_labels[i] / n_clusters)
             label_name = 'cluster' + str(i+1)
             # Plots the customers by each cluster.
+            # ax.scatter(coords_customers[clusters == i, 0], coords_customers[clusters == i, 1], s=60, c=color,
+            #            label=label_name)
             plt.scatter(coords_customers[clusters == i, 0], coords_customers[clusters == i, 1], s=60, c=color,
                         label=label_name)
             # Plots the centroid of each cluster.
+            # ax.scatter(centroids[i, 0], centroids[i, 1],
+            #            s=240, c='b', marker='x', linewidths=1)
             plt.scatter(centroids[i, 0], centroids[i, 1],
                         s=240, c='b', marker='x', linewidths=1)
 
     # Plots the warehouse.
-    plt.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
-                s=120, c='r', marker='s', label='warehouse')
-    plt.legend()
-    plt.figure(figsize=(8, 4))
-    plt.grid()
+    # plt.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
+    #             s=120, c='r', marker='s', label='warehouse')
+    # plt.legend()
+    # plt.grid()
+    ax.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
+               s=120, c='r', marker='s', label='warehouse')
+    ax.legend()
+    ax.grid()
+    st.write(fig)
     plt.savefig('./images/cluster.png')
-    st.image('./images/cluster.png')
+    # st.image('./images/cluster.png')
     return
 
 
@@ -168,7 +181,7 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
     coords_warehouses = np.array([[c.x, c.y] for c in warehouses])
     listfinal = []
     cmap = plt.cm.get_cmap('Dark2')
-    st.write("### **Final List of Customer Cardinality assigned to Vehicles:**")
+    # st.write("### **Final List of Customer Cardinality assigned to Vehicles:**")
     for i in range(0, len(vehicles)):
         vehicle = vehicles[i]
         if (i in vehicle_indexes_to_show) or (vehicle_indexes_to_show == []):
@@ -179,8 +192,8 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
                                          for c in vehicle.customers])
             # st.write('{0}: {1}'.format(label_name, coords_customers))
 
-            st.write('{0}: {1} customers'.format(
-                label_name, len(vehicle.customers)))
+            st.write('### **Vehicle {0} is assigned: {1} customers**'.format(
+                str(label_name)[7:len(str(label_name))], len(vehicle.customers)))
             listfinal.append('{0}: {1} customers'.format(
                 label_name, len(vehicle.customers)))
             fig = plt.figure(figsize=(10, 4), dpi=80)
@@ -191,7 +204,7 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
             # Plots the centroid of each cluster.
             ax.scatter(vehicle.x, vehicle.y, s=240,
                        c='b', marker='x', linewidths=1)
-    st.write(listfinal)
+    # st.write(listfinal)
     # Plots the warehouse.
     ax.scatter(coords_warehouses[:, 0], coords_warehouses[:, 1],
                s=120, c='r', marker='s', label='warehouse')
@@ -201,7 +214,7 @@ def plot_assigned_customers(warehouses, vehicles, vehicle_indexes_to_show):
     ax.legend()
     ax.grid()
     st.write(fig)
-    st.write(str(label_name)[7:len(str(label_name))])
+    # st.write(str(label_name)[7:len(str(label_name))])
     return
 
 
@@ -279,7 +292,12 @@ def detect_outliers(customers, percentile):
         '### **Average Distance from Centroid =** {0:.5f}'.format(avg_distance))
     st.write('### **Threshold distance from centroid =** {0:.5f}'.format(
         threshold_distance))
-
+    st.write("""
+    ```
+    avg_distance = np.mean(distances)
+    threshold_distance = np.percentile(distances, percentile)
+    ```
+    """)
     # Detect the outliers if the Euclidean distance between customer and centroid is greater than average distance.
     inliers = []
     outliers = []
@@ -311,7 +329,15 @@ def cluster_customers(num_clusters, customers):
     cluster_labels = np.unique(y_km)
     n_clusters = cluster_labels.shape[0]
     centroids = kmeans.cluster_centers_
-    st.write('clusters: %s' % cluster_labels)
+    st.write('Clusters: %s' % cluster_labels)
+    st.write("""
+    ```
+    coords = np.array([[c.x, c.y] for c in customers])
+    y_km = kmeans.fit_predict(coords)
+    cluster_labels = np.unique(y_km)
+    n_clusters = cluster_labels.shape[0]
+    centroids = kmeans.cluster_centers_
+    ```""")
     st.write('### Centroid Locations:\n ')
     st.write(centroids)
     return y_km, centroids
@@ -367,6 +393,15 @@ def assign_customers_to_vehicles(customers, vehicles, max_capacity):
             shortage_capacity / (len(vehicles) * 0.4))
         st.write('### **Shortage capacity: {0}, Additional capacity per vehicle: {1}**'.format(shortage_capacity,
                                                                                                additional_capacity_vehicle))
+    st.write("""
+    ```
+    max_capacity = len(customers) // NUM_VEHICLES
+    shortage_capacity = len(customers) - len(vehicles) * max_capacity
+    if shortage_capacity > 0:
+        # Allocating the additional shortage capacity to the first 40% vehicles.
+        additional_capacity_vehicle = int(
+            shortage_capacity / (len(vehicles) * 0.4))
+    ```""")
     st.text("")
     st.write("### **Initial Assignment of Customers to Vehicles:**")
     i = 0
@@ -426,16 +461,26 @@ def assign_customers_to_vehicles(customers, vehicles, max_capacity):
         listinit.append(
             'vehicle[{0}]: assigned {1} customers'.format(int(i+1), len(assigned_customers)))
         vehicles_.append(vehicle_)
+
         i += 1
         if len(customers) == 0:
             break
     st.write(listinit)
+    st.write("""
+        ```
+        vehicle_ = Vehicle(i, len(assigned_customers), 0.0, vehicle.x,
+                           vehicle.y, assigned_customers, vehicle.attributes)
+        listinit.append(
+            'vehicle[{0}]: assigned {1} customers'.format(int(i+1), len(assigned_customers)))
+        vehicles_.append(vehicle_)
+        ```""")
     # Assign the remaining customers to the nearest centroid(i.e. vehicle) if the vehicle capacity is available.
     st.write('### **Number of Unassigned Customers = %d**' % len(customers))
+    veh_un_i = 1
     if len(customers) > 0:
         unassigned_customers = []
         for customer in customers:
-            i = 1
+
             nearest_vehicle = None
             min_distance = np.inf
             for vehicle in vehicles_:
@@ -445,8 +490,8 @@ def assign_customers_to_vehicles(customers, vehicles, max_capacity):
                     nearest_vehicle = vehicle
                     # st.write('min distance: %s' % str(min_distance))
             st.write(
-                f"### Nearest Vehicle for Unassigned Customer {i}: {str(nearest_vehicle.index + 1)}")
-            i += 1
+                f"* Nearest Vehicle for Unassigned Customer {veh_un_i}: Vehicle {str(nearest_vehicle.index + 1)}")
+            veh_un_i += 1
             # st.write('nearest vehicle for Unassigned Customer : %s' %
             #          str(nearest_vehicle.index + 1))
             if nearest_vehicle is not None:
@@ -459,6 +504,29 @@ def assign_customers_to_vehicles(customers, vehicles, max_capacity):
     # st.write(listassign)
     # Should be zero
     st.write('### Number of Remaining Customers = %d' % len(customers))
+    st.write("""
+    ```
+    if len(customers) > 0:
+        unassigned_customers = []
+        for customer in customers:
+
+            nearest_vehicle = None
+            min_distance = np.inf
+            for vehicle in vehicles_:
+                dist = distance(customer, vehicle)
+                if dist <= min_distance and len(vehicle.customers) <= vehicle.capacity + additional_capacity_vehicle:
+                    min_distance = dist
+                    nearest_vehicle = vehicle
+                    # st.write('min distance: %s' % str(min_distance))
+            st.write(
+                f"* Nearest Vehicle for Unassigned Customer {veh_un_i}: Vehicle {str(nearest_vehicle.index + 1)}")
+            veh_un_i += 1
+            if nearest_vehicle is not None:
+                nearest_vehicle.customers.append(customer)
+                unassigned_customers.append(customer)
+        for customer in unassigned_customers:
+            customers.remove(customer)
+    ```""")
     # Check that the number of remaining customers is zero.
     assert len(customers) == 0
     return vehicles_
@@ -539,14 +607,16 @@ def plan_vehicle_routing(warehouse, vehicle):
 
     # 2-opt solution
     best_distance, opt, best_tour = two_opt(points)
-    st.write('* best distance: {0}'.format(str(best_distance)))
-    st.write('* best tour: {0}'.format(best_tour))
+    st.write(f"## **Vehicle {str(vehicle.index + 1)} Tour Details:**")
+    st.write('* Best Distance for Vehicle {0}: {1}'.format(
+        str(vehicle.index + 1), str(best_distance)))
+    st.write('* Best Tour: {0}'.format(best_tour))
 
     # Calculate the cost of the solution
     cost = best_distance
     # cost += distance(warehouse, points[best_tour[0]])
     # cost += distance(warehouse, points[best_tour[len(best_tour) - 1]])
-    st.write('* total cost: {0}'.format(str(cost)))
+    st.write('* Total Cost: {0}'.format(str(cost)))
 
     # Make directed cycle graph starting from the warehouse and returning to the warehouse.
     graph = []
